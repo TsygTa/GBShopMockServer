@@ -23,13 +23,18 @@ import PerfectHTTPServer
 let server = HTTPServer()
 let authController = AuthController()
 let goodsController = GoodsController()
+let reviewsController = ReviewsController()
 var routes = Routes()
 
-routes.add(method: .post, uri: "/register", handler: authController.register)
+routes.add(method: .post, uri: "/registerUser", handler: authController.registerUser)
+routes.add(method: .post, uri: "/changeUserData", handler: authController.changeUserData)
 routes.add(method: .get, uri: "/login", handler: authController.login)
 routes.add(method: .get, uri: "/logout", handler: authController.logout)
 routes.add(method: .get, uri: "/catalogData", handler: goodsController.goodsList)
 routes.add(method: .get, uri: "/getGoodById", handler: goodsController.goodById)
+routes.add(method: .get, uri: "/getReviewsList", handler: reviewsController.reviewsList)
+routes.add(method: .get, uri: "/addReview", handler: reviewsController.addReview)
+routes.add(method: .get, uri: "/removeReview", handler: reviewsController.removeReview)
 
 server.addRoutes(routes)
 server.serverPort = 8080

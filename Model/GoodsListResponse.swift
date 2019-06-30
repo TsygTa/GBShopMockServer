@@ -8,6 +8,6 @@
 import Foundation
 
 struct GoodsListResponse: Codable {
-    var result: Int
-    var goods: [Product]
+    var page_number: Int
+    var products: [Product]
 }
