@@ -24,6 +24,7 @@ let server = HTTPServer()
 let authController = AuthController()
 let goodsController = GoodsController()
 let reviewsController = ReviewsController()
+let basketController = BasketController()
 var routes = Routes()
 
 routes.add(method: .post, uri: "/registerUser", handler: authController.registerUser)
@@ -35,6 +36,9 @@ routes.add(method: .get, uri: "/getGoodById", handler: goodsController.goodById)
 routes.add(method: .get, uri: "/getReviewsList", handler: reviewsController.reviewsList)
 routes.add(method: .get, uri: "/addReview", handler: reviewsController.addReview)
 routes.add(method: .get, uri: "/removeReview", handler: reviewsController.removeReview)
+routes.add(method: .get, uri: "/addToBasket", handler: basketController.addToBasket)
+routes.add(method: .get, uri: "/deleteFromBasket", handler: basketController.deleteFromBasket)
+routes.add(method: .get, uri: "/payment", handler: basketController.payment)
 
 server.addRoutes(routes)
 server.serverPort = 8080
