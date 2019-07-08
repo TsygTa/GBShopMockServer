@@ -41,7 +41,7 @@ routes.add(method: .get, uri: "/deleteFromBasket", handler: basketController.del
 routes.add(method: .get, uri: "/payment", handler: basketController.payment)
 
 server.addRoutes(routes)
-server.serverPort = 8080
+server.serverPort = 8081
 
 do {
     try server.start()
