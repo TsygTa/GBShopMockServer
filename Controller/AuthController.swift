@@ -8,7 +8,9 @@
 import Foundation
 import PerfectHTTP
 
-class AuthController {
+/// Контроллер для формирования ответов по запросам на авторизацию,
+/// регистрацию и изменение данных пользователя
+public class AuthController {
     let registerUser: (HTTPRequest, HTTPResponse) -> () = { request, response in
         guard let str = request.postBodyString, let data = str.data(using: .utf8) else {
             response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Wrong user data"))

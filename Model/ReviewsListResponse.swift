@@ -8,6 +8,6 @@
 import Foundation
 
 struct ReviewsListResponse: Codable {
-    var page_number: Int
+    var page: Int
     var reviews: [Review]
 }

@@ -8,7 +8,8 @@
 import Foundation
 import PerfectHTTP
 
-class GoodsController {
+/// Контроллер для формирования ответов по запросам о товарах
+public class GoodsController {
     
     let goodsList: (HTTPRequest, HTTPResponse) -> () = { request, response in
         guard let page_number = request.param(name: "page_number"),

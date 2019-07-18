@@ -8,7 +8,8 @@
 import Foundation
 import PerfectHTTP
 
-class BasketController {
+/// Контроллер для формирования ответов по запросам о корзине пользователя
+public class BasketController {
     
     let addToBasket: (HTTPRequest, HTTPResponse) -> () = { request, response in
         guard let id_product = request.param(name: "id_product"),
