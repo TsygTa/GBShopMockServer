@@ -22,16 +22,7 @@ public class GoodsController {
             print("GoodsListRequest")
             if let page = Int(page_number), page > 0,
                 let categoryId = Int(id_category), categoryId > 0 {
-                var goods: [Product] = []
-                goods.append(Product(id_product: 123,
-                    product_name: "Ноутбук",
-                    price: 45600
-                ))
-                goods.append(Product(
-                    id_product: 456,
-                    product_name: "Мышка",
-                    price: 1000
-                ))
+                var goods: [Product] = Session.instance.productsCatalog
                 
                 let goodsListResponse = GoodsListResponse(page_number: 1, products: goods)
                 try response.setBody(json: goodsListResponse)

@@ -22,6 +22,9 @@ public class AuthController {
             let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
             let registerRequest = RegisterRequest(json)
             print("Request - \(registerRequest)")
+            
+            Session.instance.user = registerRequest.user
+            
             try response.setBody(json:["result": 1, "userMessage": "Регистация прошла успешно"])
             response.completed()
         } catch {
@@ -40,6 +43,9 @@ public class AuthController {
             let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
             let changeUserDataRequest = ChangeUserDataRequest(json)
             print("Request - \(changeUserDataRequest)")
+            
+            Session.instance.user = changeUserDataRequest.user
+            
             try response.setBody(json:["result": 1])
             response.completed()
         } catch {
@@ -57,16 +63,7 @@ public class AuthController {
         do {
             print("LoginRequest")
             if username == "123", password == "123" {
-                var user = User(
-                    id: 123,
-                    login: username,
-                    password: username,
-                    email: "775566@mail.ru",
-                    name: "Ivan",
-                    lastname: "Ivanov",
-                    gender: "m",
-                    creditCard: "9872389-2424-234224-234",
-                    bio: "")
+                var user = Session.instance.user
                 var loginResponse = LoginResponse(result: 1, user: user, errorMessage: nil)
                 
                 try response.setBody(json: loginResponse)
