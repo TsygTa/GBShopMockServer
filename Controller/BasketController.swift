@@ -18,8 +18,8 @@ public class BasketController {
         }
         do {
             print("GetBasketRequest")
-            if let user = Int(userId), user == 123 {
-                let basket = Session.instance.basket
+            if let user_id = Int(userId),
+                let basket = Session.instance.baskets.filter({$0.userId == user_id}).first {
                 try response.setBody(json: basket)
             } else {
                 try response.setBody(json:["result": 0, "errorMessage": "Wrong user id"])
@@ -31,7 +31,9 @@ public class BasketController {
     }
     
     let addToBasket: (HTTPRequest, HTTPResponse) -> () = { request, response in
-        guard let id_product = request.param(name: "id_product"),
+        guard
+            let id_user = request.param(name: "id_user"),
+            let id_product = request.param(name: "id_product"),
                 let quantityParameter = request.param(name: "quantity") else {
             response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Wrong request parameters"))
             return
@@ -39,22 +41,25 @@ public class BasketController {
         
         do {
             print("AddToBasketRequest")
-            if let productId = Int(id_product), productId > 0,
-                let quantity = Int(quantityParameter), quantity > 0,
-                var product = (Session.instance.productsCatalog
-                    .filter{$0.id_product == productId}).first {
-                
-                product.quantity = quantity
-                if let index = Session.instance.basket.products.firstIndex(where: {$0.id_product == productId}), index >= 0 {
-                    Session.instance.basket.products[index].quantity = product.quantity
+            if let userId = Int(id_user),
+                let basketIndex = Session.instance.baskets.firstIndex(where: {$0.userId == userId}) {
+                if let productId = Int(id_product),
+                    let quantity = Int(quantityParameter), quantity > 0,
+                    var product = (Session.instance.productsCatalog
+                        .filter{$0.id_product == productId}).first {
+                    let basket = Session.instance.baskets[basketIndex]
+                    product.quantity = quantity
+                    if let productIndex = basket.products.firstIndex(where: {$0.id_product == productId}), productIndex >= 0 {
+                        Session.instance.baskets[basketIndex].products[productIndex].quantity = product.quantity
+                    } else {
+                        Session.instance.baskets[basketIndex].products.append(product)
+                    }
+                    try response.setBody(json:["result": 1])
                 } else {
-                    Session.instance.basket.products.append(product)
+                    try response.setBody(json:["result": 0, "errorMessage": "Wrong product id or quantity of products"])
                 }
-                
-                try response.setBody(json:["result": 1])
-                
             } else {
-                try response.setBody(json:["result": 0, "errorMessage": "Wrong product id or quantity of products"])
+                try response.setBody(json:["result": 0, "errorMessage": "Wrong user id"])
             }
             response.completed()
         } catch {
@@ -63,18 +68,21 @@ public class BasketController {
     }
     
     let deleteFromBasket: (HTTPRequest, HTTPResponse) -> () = { request, response in
-        guard let productId = request.param(name: "id_product") else {
+        guard let id_user = request.param(name: "id_user"),
+            let productId = request.param(name: "id_product") else {
                 response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Wrong request parameters"))
                 return
         }
         
         do {
             print("DeleteFromBasketRequest")
-            if let id = Int(productId), id >= 0 {
-                Session.instance.basket.products = Session.instance.basket.products.filter{$0.id_product != id}
+            if let userId = Int(id_user),
+                let basketIndex = Session.instance.baskets.firstIndex(where: {$0.userId == userId}),
+                let id = Int(productId), id >= 0 {
+                Session.instance.baskets[basketIndex].products = Session.instance.baskets[basketIndex].products.filter{$0.id_product != id}
                 try response.setBody(json:["result": 1])
             } else {
-                try response.setBody(json:["result": 0, "errorMessage": "Wrong product index"])
+                try response.setBody(json:["result": 0, "errorMessage": "Wrong request parameters"])
             }
             response.completed()
         } catch {
@@ -89,12 +97,12 @@ public class BasketController {
         }
         do {
             print("PaymentRequest")
-            if let userId = Int(id_user), userId > 0 {
-                Session.instance.basket.isPaid = true
+            if let userId = Int(id_user),
+                let basketIndex = Session.instance.baskets.firstIndex(where: {$0.userId == userId}) {
+                Session.instance.baskets[basketIndex].isPaid = true
                 try response.setBody(json:["result": 1, "userMessage": "Оплата прошла успешно"])
                 
             } else {
-                Session.instance.basket.isPaid = false
                 try response.setBody(json:["result": 0, "errorMessage": "Wrong user id"])
             }
             response.completed()

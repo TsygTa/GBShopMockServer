@@ -21,11 +21,31 @@ public class AuthController {
             print("RegisterUserRequest")
             let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
             let registerRequest = RegisterRequest(json)
-            print("Request - \(registerRequest)")
+            var user = registerRequest.user
             
-            Session.instance.user = registerRequest.user
-            
-            try response.setBody(json:["result": 1, "userMessage": "Регистация прошла успешно"])
+            if Session.instance.users.filter({$0.login == user.login}).first != nil {
+                try response.setBody(json:["result": 0, "userMessage": "Пользователь с таким логином уже зарегистрирован"])
+            } else {
+                print("Request - \(registerRequest)")
+                
+                var lastId = 1
+                if let lastUser = Session.instance.users.last {
+                    lastId = lastUser.id + 1
+                }
+                user.id = lastId
+                Session.instance.users.append(user)
+                
+                var lastBasketId = 1
+                if let lastBasket = Session.instance.baskets.last {
+                    lastBasketId = lastBasket.id + 1
+                }
+                Session.instance.baskets.append(Basket(id: lastBasketId,
+                                      userId: user.id,
+                                      products: [],
+                                      isPaid: false))
+                
+                try response.setBody(json:["result": 1, "userId": user.id, "userMessage": "Регистация прошла успешно"])
+            }
             response.completed()
         } catch {
             response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Parse data error - \(error)"))
@@ -42,11 +62,15 @@ public class AuthController {
             print("ChangeUserDataRequest")
             let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
             let changeUserDataRequest = ChangeUserDataRequest(json)
+            let user = changeUserDataRequest.user
             print("Request - \(changeUserDataRequest)")
             
-            Session.instance.user = changeUserDataRequest.user
-            
-            try response.setBody(json:["result": 1])
+            if let index = Session.instance.users.firstIndex(where: {$0.id == user.id}), index >= 0 {
+                Session.instance.users[index] = user
+                try response.setBody(json:["result": 1])
+            } else {
+                try response.setBody(json:["result": 0, "errorMessage": "Пользователь не найден"])
+            }
             response.completed()
         } catch {
             response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Parse data error - \(error)"))
@@ -62,8 +86,7 @@ public class AuthController {
         
         do {
             print("LoginRequest")
-            if username == "123", password == "123" {
-                var user = Session.instance.user
+            if let user = Session.instance.users.filter({$0.login == username && $0.password == password}).first {
                 var loginResponse = LoginResponse(result: 1, user: user, errorMessage: nil)
                 
                 try response.setBody(json: loginResponse)

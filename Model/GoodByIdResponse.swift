@@ -9,7 +9,5 @@ import Foundation
 
 struct GoodByIdResponse: Codable {
     var result: Int
-    var product_name: String
-    var product_price: Int
-    var product_description: String
+    var product: Product
 }
