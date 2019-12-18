@@ -22,35 +22,8 @@ public class ReviewsController {
             print("ReviewsListRequest")
             if let page = Int(page_number), page > 0,
                 let product = Int(productId), product > 0 {
-                var reviews: [Review] = []
-                reviews.append(Review(id: 57,
-                                     userId: 123,
-                                     productId: 123,
-                                     text: "Отзыв пользователя 57"
-                ))
-                reviews.append(Review(id: 80,
-                                     userId: 567,
-                                     productId: 123,
-                                     text: "Отзыв пользователя 80"
-                ))
                 
-                reviews.append(Review(id: 33,
-                                      userId: 77,
-                                      productId: 456,
-                                      text: "Отзыв пользователя 80"
-                ))
-                reviews.append(Review(id: 45,
-                                      userId: 567,
-                                      productId: 456,
-                                      text: "Отзыв пользователя 567"
-                ))
-                reviews.append(Review(id: 44,
-                                      userId: 568,
-                                      productId: 456,
-                                      text: "Отзыв пользователя 568"
-                ))
-                
-                let filtered = reviews.filter{$0.productId == product}
+                let filtered = Session.instance.reviews.filter{$0.productId == product}
                 
                 let reviwsListResponse = ReviewsListResponse(page: 1, reviews: filtered)
                 try response.setBody(json: reviwsListResponse)
@@ -65,7 +38,8 @@ public class ReviewsController {
     }
     
     let addReview: (HTTPRequest, HTTPResponse) -> () = { request, response in
-        guard let user = request.param(name: "userId"),
+        guard let user = request.param(name: "id_user"),
+                let product = request.param(name: "id_product"),
                 let text = request.param(name: "text") else {
             response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Wrong request parameters"))
             return
@@ -74,11 +48,23 @@ public class ReviewsController {
         do {
             print("AddReviewRequest")
             if let userId = Int(user), userId > 0,
+                let productId = Int(product), productId > 0,
                 !text.isEmpty {
+                
+                var lastId = 1
+                
+                if let review = Session.instance.reviews.last {
+                    lastId = review.id + 1
+                }
+                Session.instance.reviews.append(Review(id: lastId,
+                                                       userId: userId,
+                                                       productId: productId,
+                                                       text: text
+                ))
                 try response.setBody(json:["result": 1, "userMessage": "Ваш отзыв был передан на модерацию"])
                 
             } else {
-                try response.setBody(json:["result": 0, "errorMessage": "Wrong review id or text"])
+                try response.setBody(json:["result": 0, "errorMessage": "Wrong request parameters"])
             }
             response.completed()
         } catch {
@@ -87,14 +73,14 @@ public class ReviewsController {
     }
     
     let removeReview: (HTTPRequest, HTTPResponse) -> () = { request, response in
-        guard let review = request.param(name: "id") else {
+        guard let review = request.param(name: "id_comment") else {
                 response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Wrong request parameters"))
                 return
         }
         do {
             print("RemoveReviewRequest")
             if let reviewId = Int(review), reviewId > 0 {
-                
+                Session.instance.reviews = Session.instance.reviews.filter{$0.id != reviewId}
                 try response.setBody(json:["result": 1])
                 
             } else {

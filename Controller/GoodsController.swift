@@ -45,12 +45,13 @@ public class GoodsController {
         do {
             print("GoodByIdRequest")
             if let productId = Int(id_product), productId > 0 {
-                let good = GoodByIdResponse(result: 1,
-                                            product_name: "Товар",
-                                            product_price: 123,
-                                            product_description: "Описание")
                 
-                try response.setBody(json: good)
+                if let good = Session.instance.productsCatalog.filter({$0.id_product == productId}).first {
+                    try response.setBody(json: GoodByIdResponse(result: 1,
+                                                                product: good))
+                } else {
+                    try response.setBody(json:["result": 0, "errorMessage": "Wrong product id"])
+                }
                 
             } else {
                 try response.setBody(json:["result": 0, "errorMessage": "Wrong product id"])

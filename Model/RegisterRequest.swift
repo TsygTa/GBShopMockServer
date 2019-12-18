@@ -8,35 +8,36 @@
 import Foundation
 
 struct RegisterRequest {
-    var id_user: Int = 0
-    var username: String = ""
-    var password: String = ""
-    var email: String = ""
-    var gender: String = ""
-    var credit_card: String = ""
-    var bio: String = ""
+    var user: User = User()
     
     init(_ json: [String: AnyObject]) {
-        if let id_user = json["id_user"] as? Int {
-            self.id_user = id_user
+        
+        if let user_id = json["id"] as? Int {
+            self.user.id = user_id
         }
-        if let username = json["username"] as? String {
-            self.username = username
+        if let login = json["login"] as? String {
+            self.user.login = login
+        }
+        if let name = json["name"] as? String {
+            self.user.name = name
+        }
+        if let lastname = json["lastname"] as? String {
+            self.user.lastname = lastname
         }
         if let password = json["password"] as? String {
-            self.password = password
+            self.user.password = password
         }
         if let email = json["email"] as? String {
-            self.email = email
+            self.user.email = email
         }
         if let gender = json["gender"] as? String {
-            self.gender = gender
+            self.user.gender = gender
         }
-        if let credit_card = json["credit_card"] as? String {
-            self.credit_card = credit_card
+        if let creditCard = json["creditCard"] as? String {
+            self.user.creditCard = creditCard
         }
         if let bio = json["bio"] as? String {
-            self.bio = bio
+            self.user.bio = bio
         }
     }
 }
