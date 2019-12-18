@@ -54,18 +54,23 @@ class AuthController {
         
         do {
             print("LoginRequest")
-            if username == "Somebody", password == "mypassword" {
+            if username == "123", password == "123" {
                 var user = User(
-                    id_user: 123,
-                    user_login: "test",
-                    user_name: "Ivan",
-                    user_lastname: "Ivanov")
-                var loginResponse = LoginResponse(result: 1, user: user)
+                    id: 123,
+                    login: username,
+                    password: username,
+                    email: "775566@mail.ru",
+                    name: "Ivan",
+                    lastname: "Ivanov",
+                    gender: "m",
+                    creditCard: "9872389-2424-234224-234",
+                    bio: "")
+                var loginResponse = LoginResponse(result: 1, user: user, errorMessage: nil)
                 
                 try response.setBody(json: loginResponse)
                 
             } else {
-                try response.setBody(json:["result": 0, "errorMessage": "Wrong user name or password"])
+                try response.setBody(json:["result": 0, "user": nil,"errorMessage": "Wrong user name or password"])
             }
             response.completed()
         } catch {

@@ -9,5 +9,6 @@ import Foundation
 
 struct LoginResponse: Codable {
     var result: Int
-    var user: User
+    var user: User?
+    var errorMessage: String?
 }
