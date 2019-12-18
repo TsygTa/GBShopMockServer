@@ -8,7 +8,15 @@
 import Foundation
 
 struct Review: Codable {
-    var id_comment: Int
-    var id_user: Int
+    var id: Int
+    var userId: Int?
+    var productId: Int
     var text: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case userId
+        case productId
+        case text
+    }
 }
