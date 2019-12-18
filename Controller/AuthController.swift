@@ -9,17 +9,36 @@ import Foundation
 import PerfectHTTP
 
 class AuthController {
-    let register: (HTTPRequest, HTTPResponse) -> () = { request, response in
+    let registerUser: (HTTPRequest, HTTPResponse) -> () = { request, response in
         guard let str = request.postBodyString, let data = str.data(using: .utf8) else {
             response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Wrong user data"))
             return
         }
         
         do {
+            print("RegisterUserRequest")
             let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
             let registerRequest = RegisterRequest(json)
             print("Request - \(registerRequest)")
             try response.setBody(json:["result": 1, "userMessage": "Регистация прошла успешно"])
+            response.completed()
+        } catch {
+            response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Parse data error - \(error)"))
+        }
+    }
+    
+    let changeUserData: (HTTPRequest, HTTPResponse) -> () = { request, response in
+        guard let str = request.postBodyString, let data = str.data(using: .utf8) else {
+            response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Wrong user data"))
+            return
+        }
+        
+        do {
+            print("ChangeUserDataRequest")
+            let json = try JSONSerialization.jsonObject(with: data, options: []) as! [String: AnyObject]
+            let changeUserDataRequest = ChangeUserDataRequest(json)
+            print("Request - \(changeUserDataRequest)")
+            try response.setBody(json:["result": 1])
             response.completed()
         } catch {
             response.completed(status: HTTPResponseStatus.custom(code: 500, message: "Parse data error - \(error)"))
@@ -61,6 +80,7 @@ class AuthController {
         }
         
         do {
+            print("LogoutRequest")
             if let userId = Int(id_user), userId > 0 {
                 try response.setBody(json: ["result": 1])
                 

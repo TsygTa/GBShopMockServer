@@ -18,6 +18,7 @@ class GoodsController {
         }
         
         do {
+            print("GoodsListRequest")
             if let page = Int(page_number), page > 0,
                 let categoryId = Int(id_category), categoryId > 0 {
                 var goods: [Product] = []
@@ -31,7 +32,7 @@ class GoodsController {
                     price: 1000
                 ))
                 
-                let goodsListResponse = GoodsListResponse(result: 1, goods: goods)
+                let goodsListResponse = GoodsListResponse(page_number: 1, products: goods)
                 try response.setBody(json: goodsListResponse)
                 
             } else {
@@ -50,6 +51,7 @@ class GoodsController {
         }
         
         do {
+            print("GoodByIdRequest")
             if let productId = Int(id_product), productId > 0 {
                 let good = GoodByIdResponse(result: 1,
                                             product_name: "Товар",
